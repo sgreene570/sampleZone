@@ -6,6 +6,6 @@
 // @param channels: int audio channels
 // @param seconds: int how much of audio file to play
 // @param fd: int file descriptor
-void playback(int rate, int channels, int seconds, int fd);
+void playback(int rate, int channels, double seconds, int fd);
 
 #endif

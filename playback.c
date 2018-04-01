@@ -20,7 +20,7 @@
 
 #define PCM_DEVICE "default"
 
-void playback(int rate, int channels, int seconds, int fd){
+void playback(int rate, int channels, double seconds, int fd){
     snd_pcm_t *pcm_handle;
     snd_pcm_hw_params_t *params;
     snd_pcm_uframes_t frames;
@@ -74,7 +74,7 @@ void playback(int rate, int channels, int seconds, int fd){
     snd_pcm_hw_params_get_rate(params, &tmp, 0);
     printf("rate: %d bps\n", tmp);
 
-    printf("seconds: %d\n", seconds);
+    printf("seconds: %.2f\n", seconds);
 
     /* Allocate buffer to hold single period */
     snd_pcm_hw_params_get_period_size(params, &frames, 0);
