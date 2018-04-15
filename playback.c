@@ -105,7 +105,9 @@ void playback(int rate, int channels, double seconds, int fd){
     snd_pcm_close(pcm_handle);
     free(buff);
 }
-/*
+
+/* Sample main function for testing playback
+* Comment out when compiling against another main function
 *int main(int argc, char **argv) {
 *    int rate, channels, seconds, fd;
 *    if (argc < 5) {

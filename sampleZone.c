@@ -1,5 +1,7 @@
 /*
 * Hghway to the sample zone.
+* Work in progress
+* @sgreene570
 */
 
 #include <stdio.h>
@@ -10,37 +12,18 @@
 #include <fcntl.h>
 #include "playback.h"
 
-#define PLAYBACK_RATE 44100
-#define AUDIO_CHANNELS 2
-
-typedef struct wavHeader_t {
-    u_int32_t chunkID;
-    u_int32_t chunkSize;
-    u_int32_t format;
-    u_int32_t subChunk1ID;
-    u_int32_t subChunk1Size;
-    u_int16_t audioFormat;
-    u_int16_t numChannels;
-    u_int32_t sampleRate;
-    u_int32_t byteRate;
-    u_int16_t blockAlign;
-    u_int16_t bitsPerSample;
-    u_int32_t subChunk2ID;
-    u_int32_t subChunk2Size;
-} wavHeader;
-
 double wavLength(u_int32_t wavSize, u_int32_t byteRate) {
     return (double) wavSize / byteRate;
 }
 
 void *playFile(void *fd) {
-    int file = (int) fd;
+    int file = *((int *) fd);
     // Read wav file header (44 bytes long)
     wavHeader *header =  calloc(1, 44);
     int out = read(file, header, 44);
     if (out != 44) {
         printf("Error reading wav header\n");
-        return;
+        return NULL;
     }
     double length = wavLength(header->subChunk2Size, header->byteRate);
     printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
@@ -61,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     for(int i = 0; i < numFiles; i++) {
         fd = open(args[i], O_RDONLY);
-        pthread_create(&threads[i], NULL, playFile, (void *)fd);
+        pthread_create(&threads[i], NULL, playFile, &fd);
     }
     pthread_exit(NULL);
     return 0;
