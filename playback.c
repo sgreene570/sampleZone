@@ -16,16 +16,17 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <alloca.h>
 #include "playback.h"
 
 #define PCM_DEVICE "default"
 
-void playback(int rate, int channels, double seconds, int fd){
+void playback(unsigned int rate, int channels, double seconds, int fd){
     snd_pcm_t *pcm_handle;
     snd_pcm_hw_params_t *params;
     snd_pcm_uframes_t frames;
-    unsigned int pcm, tmp;
-    int buff_size, loops;
+    unsigned int tmp;
+    int buff_size, loops, pcm;
     char *buff;
 
     /* Open the PCM device in playback mode */

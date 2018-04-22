@@ -26,7 +26,8 @@ void *playFile(void *fd) {
         return NULL;
     }
     double length = wavLength(header->subChunk2Size, header->byteRate);
-    printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
+    // Debug wav header
+    //printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
     playback(header->sampleRate, header->numChannels, length, file);
     pthread_exit(NULL);
 }

@@ -6,7 +6,7 @@
 // @param channels: int audio channels
 // @param seconds: int how much of audio file to play
 // @param fd: int file descriptor
-void playback(int rate, int channels, double seconds, int fd);
+void playback(unsigned int rate, int channels, double seconds, int fd);
 
 // WAV file header spec as per Msft standard
 typedef struct wavHeader_t {
