@@ -8,14 +8,15 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <ncurses.h>
+#include <unistd.h>
 #include "playback.h"
 
 #define WINDOW_HEIGHT 20
 #define WINDOW_WIDTH 30
 #define OFFSET 1
+#define SAMPLE_MARKERS "0123456789"
 
 double wavLength(u_int32_t wavSize, u_int32_t byteRate) {
     return (double) wavSize / byteRate;
@@ -44,12 +45,40 @@ static WINDOW *create_newwin(int height, int width, int starty, int startx) {
     return (local_win);
 }
 
+bool checkSymbol(char input, char *symbols, int numSymbols) {
+    for (int i = 0; i < numSymbols; i++) {
+        if (symbols[i] == input) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void playAudio(WINDOW *win, char *files[]) {
+    for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
+        for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET; x++) {
+
+            usleep(83333);
+            wmove(win, y, x);
+            wrefresh(win);
+            int ch = mvwinch(win, y, x) & A_CHARTEXT;
+            pthread_t *thread;
+            if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
+                printw("PLAYING\n");
+                int fd = open(files[atoi(ch + "")], O_RDONLY);
+                pthread_create(thread, NULL, playFile, &fd);
+            }
+        }
+    }
+    pthread_exit(NULL);
+}
+
 int main(int argc, char *argv[]) {
     int numFiles = argc - 1;
-    char *args[numFiles];
+    char *files[numFiles];
     // Parse file name input
     for(int i = 1; i < argc; i++) {
-        args[i - 1] = argv[i];
+        files[i - 1] = argv[i];
     }
 
     pthread_t threads[numFiles];
@@ -75,32 +104,38 @@ int main(int argc, char *argv[]) {
     WINDOW *win = create_newwin(WINDOW_HEIGHT, WINDOW_WIDTH, y, x);
     wmove(win, y, x);
     refresh();
-
     while((ch = wgetch(win)) != 'q') {
-        switch(ch) {
-            case 'h':
-                if(x - 1 > OFFSET - 1) {
-                    x--;
+        if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
+            mvaddch(y + 1, x + 1, ch);
+        } else if (ch == ' ') {
+            playAudio(win, files);
+        } else {
+            // Vim arrow controls with grid boundaries in mind
+            switch(ch) {
+                case 'h':
+                    if(x - 1 > OFFSET - 1) {
+                        x--;
+                    }
+                    break;
+                case 'l':
+                    if(x + 1 < OFFSET + WINDOW_WIDTH - 2) {
+                        x++;
+                    }
+                    break;
+                case 'j':
+                    if(y + 1 < OFFSET + WINDOW_HEIGHT - 2) {
+                        y++;
+                    }
+                    break;
+                case 'k':
+                    if(y - 1 > OFFSET - 1) {
+                        y--;
+                    }
+                    break;
                 }
-                break;
-            case 'l':
-                if(x + 1 < OFFSET + WINDOW_WIDTH - 2) {
-                    x++;
-                }
-                break;
-            case 'j':
-                if(y + 1 < OFFSET + WINDOW_HEIGHT - 2) {
-                    y++;
-                }
-                break;
-            case 'k':
-                if(y - 1 > OFFSET - 1) {
-                    y--;
-                }
-                break;
-            }
-
-        wmove(win, y, x);
+            wmove(win, y, x);
+        }
+        // Refresh grid after each cursor move or screen print (important)
         refresh();
     }
 
