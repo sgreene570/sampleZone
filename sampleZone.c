@@ -32,8 +32,9 @@ void *playFile(void *fd) {
         return NULL;
     }
     double length = wavLength(header->subChunk2Size, header->byteRate);
-    //Debug wav header
-    printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length); playback(header->sampleRate, header->numChannels, length, file);
+    // Debug wav header
+    // printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
+    playback(header->sampleRate, header->numChannels, length, file);
     pthread_exit(NULL);
 }
 
@@ -54,23 +55,31 @@ bool checkSymbol(char input, char *symbols, int numSymbols) {
     return false;
 }
 
-void playAudio(WINDOW *win, char *files[]) {
+void playPattern(WINDOW *win, char *files[]) {
     for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
         for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET; x++) {
-
             usleep(83333);
             wmove(win, y, x);
+            char ch = winch(win) & A_CHARTEXT;
             wrefresh(win);
-            int ch = mvwinch(win, y, x) & A_CHARTEXT;
-            pthread_t *thread;
+            pthread_t thread;
             if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
-                printw("PLAYING\n");
+                wrefresh(win);
                 int fd = open(files[atoi(ch + "")], O_RDONLY);
-                pthread_create(thread, NULL, playFile, &fd);
+                pthread_create(&thread, NULL, playFile, &fd);
             }
         }
     }
     pthread_exit(NULL);
+}
+
+// Ncurses startup calls
+void initCurses() {
+    initscr();
+    cbreak();
+    keypad(stdscr, TRUE);
+    noecho();
+
 }
 
 int main(int argc, char *argv[]) {
@@ -93,22 +102,19 @@ int main(int argc, char *argv[]) {
     */
 
     // Ncurses code
-    initscr();
-    cbreak();
-    keypad(stdscr, TRUE);
-    noecho();
+    initCurses();
     int x = OFFSET;
     int y = OFFSET;
-    int ch;
+    char ch;
     refresh();
     WINDOW *win = create_newwin(WINDOW_HEIGHT, WINDOW_WIDTH, y, x);
     wmove(win, y, x);
-    refresh();
+    wrefresh(win);
     while((ch = wgetch(win)) != 'q') {
         if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
-            mvaddch(y + 1, x + 1, ch);
+            mvwaddch(win, y, x, ch);
         } else if (ch == ' ') {
-            playAudio(win, files);
+            playPattern(win, files);
         } else {
             // Vim arrow controls with grid boundaries in mind
             switch(ch) {
@@ -136,7 +142,7 @@ int main(int argc, char *argv[]) {
             wmove(win, y, x);
         }
         // Refresh grid after each cursor move or screen print (important)
-        refresh();
+        wrefresh(win);
     }
 
     endwin();

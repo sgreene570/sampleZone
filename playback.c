@@ -60,22 +60,24 @@ void playback(unsigned int rate, int channels, double seconds, int fd){
         printf("ERROR: Can't set harware parameters. %s\n", snd_strerror(pcm));
 
     /* Resume information */
-    printf("PCM name: '%s'\n", snd_pcm_name(pcm_handle));
+    //printf("PCM name: '%s'\n", snd_pcm_name(pcm_handle));
 
-    printf("PCM state: %s\n", snd_pcm_state_name(snd_pcm_state(pcm_handle)));
+    //printf("PCM state: %s\n", snd_pcm_state_name(snd_pcm_state(pcm_handle)));
 
     snd_pcm_hw_params_get_channels(params, &tmp);
-    printf("channels: %i ", tmp);
+    //printf("channels: %i ", tmp);
 
+    /*
     if (tmp == 1)
         printf("(mono)\n");
     else if (tmp == 2)
         printf("(stereo)\n");
+    */
 
     snd_pcm_hw_params_get_rate(params, &tmp, 0);
-    printf("rate: %d bps\n", tmp);
+    //printf("rate: %d bps\n", tmp);
 
-    printf("seconds: %.2f\n", seconds);
+    //printf("seconds: %.2f\n", seconds);
 
     /* Allocate buffer to hold single period */
     snd_pcm_hw_params_get_period_size(params, &frames, 0);
