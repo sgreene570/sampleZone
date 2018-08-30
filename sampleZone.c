@@ -66,7 +66,7 @@ void playPattern(WINDOW *win, char *files[]) {
             int fd;
             if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
                 wrefresh(win);
-                fd = open(files[(int) ch - '0' - 1], O_RDONLY);
+                fd = open(files[(int) ch - '0'], O_RDONLY);
                 pthread_create(&thread, NULL, playFile, &fd);
             }
         }
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 
     /*
     for(int i = 0; i < numFiles; i++) {
-        fd = open(args[i], O_RDONLY);
+        fd = open(argv[i], O_RDONLY);
         pthread_create(&threads[i], NULL, playFile, &fd);
     }
     pthread_exit(NULL);
@@ -109,8 +109,14 @@ int main(int argc, char *argv[]) {
     char ch;
     refresh();
     WINDOW *win = create_newwin(WINDOW_HEIGHT, WINDOW_WIDTH, y, x);
+    wrefresh(win);
+    for(int i = 1; i <= numFiles; i++) {
+        mvprintw(WINDOW_HEIGHT + i, 0, "%d: %s", i - 1, argv[i]);
+    }
+    refresh();
     wmove(win, y, x);
     wrefresh(win);
+
     while((ch = wgetch(win)) != 'q') {
         if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
             mvwaddch(win, y, x, ch);
