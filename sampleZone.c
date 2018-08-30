@@ -57,15 +57,16 @@ bool checkSymbol(char input, char *symbols, int numSymbols) {
 
 void playPattern(WINDOW *win, char *files[]) {
     for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
-        for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET; x++) {
+        for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET - 1; x++) {
             usleep(83333);
             wmove(win, y, x);
             char ch = winch(win) & A_CHARTEXT;
             wrefresh(win);
             pthread_t thread;
+            int fd;
             if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
                 wrefresh(win);
-                int fd = open(files[atoi(ch + "")], O_RDONLY);
+                fd = open(files[(int) ch - '0' - 1], O_RDONLY);
                 pthread_create(&thread, NULL, playFile, &fd);
             }
         }
@@ -79,7 +80,6 @@ void initCurses() {
     cbreak();
     keypad(stdscr, TRUE);
     noecho();
-
 }
 
 int main(int argc, char *argv[]) {
@@ -88,6 +88,7 @@ int main(int argc, char *argv[]) {
     // Parse file name input
     for(int i = 1; i < argc; i++) {
         files[i - 1] = argv[i];
+        fprintf(stderr, "%s\n", argv[i]);
     }
 
     pthread_t threads[numFiles];
