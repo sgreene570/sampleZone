@@ -56,8 +56,12 @@ bool checkSymbol(char input, char *symbols, int numSymbols) {
 }
 
 void playPattern(WINDOW *win, char *files[]) {
+    nodelay(win, TRUE);
     for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
         for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET - 1; x++) {
+            if (wgetch(win) == ' ') {
+                return;
+            }
             usleep(83333);
             wmove(win, y, x);
             char ch = winch(win) & A_CHARTEXT;
@@ -70,6 +74,7 @@ void playPattern(WINDOW *win, char *files[]) {
                 pthread_create(&thread, NULL, playFile, &fd);
             }
         }
+
     }
     pthread_exit(NULL);
 }
@@ -122,6 +127,7 @@ int main(int argc, char *argv[]) {
             mvwaddch(win, y, x, ch);
         } else if (ch == ' ') {
             playPattern(win, files);
+            wmove(win, y, x);
         } else {
             // Vim arrow controls with grid boundaries in mind
             switch(ch) {
