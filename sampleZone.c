@@ -31,13 +31,12 @@ void *playFile(void *fd) {
         printf("Error reading wav header\n");
         return NULL;
     }
-    double length = wavLength(header->subChunk2Size, header->byteRate);
+    double length = wavLength(header->subChunk2Size, header->byteRate); 
     // Debug wav header
     // printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
     playback(header->sampleRate, header->numChannels, length, file);
     pthread_exit(NULL);
 }
-
 
 static WINDOW *create_newwin(int height, int width, int starty, int startx) {
     WINDOW *local_win = newwin(height, width, starty, startx);
@@ -55,14 +54,16 @@ bool checkSymbol(char input, char *symbols, int numSymbols) {
     return false;
 }
 
-void playPattern(WINDOW *win, char *files[]) {
+void playPattern(WINDOW *win, char *files[], int tempo) {
     nodelay(win, TRUE);
     for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
         for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET - 1; x++) {
             if (wgetch(win) == ' ') {
                 return;
             }
-            usleep(83333);
+            // Calculates seconds per beat
+            double spb = 60 / (1.0 * tempo);
+            usleep(spb * 1000000);
             wmove(win, y, x);
             char ch = winch(win) & A_CHARTEXT;
             wrefresh(win);
@@ -115,18 +116,28 @@ int main(int argc, char *argv[]) {
     refresh();
     WINDOW *win = create_newwin(WINDOW_HEIGHT, WINDOW_WIDTH, y, x);
     wrefresh(win);
+    // Print file names and symbols
+    mvprintw(WINDOW_HEIGHT + 1, 0, "Loaded Samples:\n");
     for(int i = 1; i <= numFiles; i++) {
-        mvprintw(WINDOW_HEIGHT + i, 0, "%d: %s", i - 1, argv[i]);
+        mvprintw(WINDOW_HEIGHT + i  + 1, 0, "%d: %s", i - 1, argv[i]);
     }
+
+    // Play back vars
+    int tempo = 120;
+
+    // Print usage info left of the game grid
+    mvprintw(2, WINDOW_WIDTH + 3, "Start/Stop sequence: Spacebar\n");
+    mvprintw(3, WINDOW_WIDTH + 3, "Inc/Dec tempo: +/-\n");
+    mvprintw(4, WINDOW_WIDTH + 3, "Tempo: %d\n", tempo);
+
     refresh();
     wmove(win, y, x);
     wrefresh(win);
-
     while((ch = wgetch(win)) != 'q') {
         if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
             mvwaddch(win, y, x, ch);
         } else if (ch == ' ') {
-            playPattern(win, files);
+            playPattern(win, files, tempo);
             wmove(win, y, x);
         } else {
             // Vim arrow controls with grid boundaries in mind
@@ -150,6 +161,16 @@ int main(int argc, char *argv[]) {
                     if(y - 1 > OFFSET - 1) {
                         y--;
                     }
+                    break;
+                case '+':
+                    tempo++;
+                    mvprintw(4, WINDOW_WIDTH + 10, "%d\n", tempo);
+                    refresh();
+                    break;
+                case '-':
+                    tempo--;
+                    mvprintw(4, WINDOW_WIDTH + 10, "%d\n", tempo);
+                    refresh();
                     break;
                 }
             wmove(win, y, x);
