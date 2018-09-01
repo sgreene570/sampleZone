@@ -18,15 +18,20 @@
 #define OFFSET 1
 #define SAMPLE_MARKERS "0123456789"
 
+typedef struct audioFile_t {
+    int fd;
+    int pitchAdjust;
+} audioFile;
+
 double wavLength(u_int32_t wavSize, u_int32_t byteRate) {
     return (double) wavSize / byteRate;
 }
 
-void *playFile(void *fd) {
-    int file = *((int *) fd);
+void *playFile(void *file) {
+    int fd = ((audioFile *)file)->fd;
     // Read wav file header (44 bytes long)
     wavHeader *header =  calloc(1, 44);
-    int out = read(file, header, 44);
+    int out = read(fd, header, 44);
     if (out != 44) {
         printf("Error reading wav header\n");
         return NULL;
@@ -34,7 +39,7 @@ void *playFile(void *fd) {
     double length = wavLength(header->subChunk2Size, header->byteRate); 
     // Debug wav header
     // printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
-    playback(header->sampleRate, header->numChannels, length, file);
+    playback(header->sampleRate + (((audioFile *) file)->pitchAdjust * 500), header->numChannels, length, fd);
     pthread_exit(NULL);
 }
 
@@ -68,11 +73,12 @@ void playPattern(WINDOW *win, char *files[], int tempo) {
             char ch = winch(win) & A_CHARTEXT;
             wrefresh(win);
             pthread_t thread;
-            int fd;
+            audioFile *file = calloc(1, sizeof(audioFile));
             if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
                 wrefresh(win);
-                fd = open(files[(int) ch - '0'], O_RDONLY);
-                pthread_create(&thread, NULL, playFile, &fd);
+                file->fd = open(files[(int) ch - '0'], O_RDONLY);
+                file->pitchAdjust = 5;
+                pthread_create(&thread, NULL, playFile, file);
             }
         }
 
