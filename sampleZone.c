@@ -59,7 +59,17 @@ bool checkSymbol(char input, char *symbols, int numSymbols) {
     return false;
 }
 
-void playPattern(WINDOW *win, char *files[], int tempo) {
+audioFile *initFiles(int numFiles, char *fileNames[]) {
+    audioFile *files = calloc(numFiles, sizeof(audioFile));
+    for(int i = 0; i < numFiles; i++) {
+        files[i].fd = open(fileNames[i], O_RDONLY);
+        files[i].pitchAdjust = 0;
+    }
+
+    return files;
+}
+
+void playPattern(WINDOW *win, audioFile *files, int tempo) {
     nodelay(win, TRUE);
     for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
         for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET - 1; x++) {
@@ -73,12 +83,9 @@ void playPattern(WINDOW *win, char *files[], int tempo) {
             char ch = winch(win) & A_CHARTEXT;
             wrefresh(win);
             pthread_t thread;
-            audioFile *file = calloc(1, sizeof(audioFile));
             if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
                 wrefresh(win);
-                file->fd = open(files[(int) ch - '0'], O_RDONLY);
-                file->pitchAdjust = 5;
-                pthread_create(&thread, NULL, playFile, file);
+                pthread_create(&thread, NULL, playFile, &files[(int) ch - '0']);
             }
         }
 
@@ -96,23 +103,12 @@ void initCurses() {
 
 int main(int argc, char *argv[]) {
     int numFiles = argc - 1;
-    char *files[numFiles];
+    char *fileNames[numFiles];
     // Parse file name input
     for(int i = 1; i < argc; i++) {
-        files[i - 1] = argv[i];
+        fileNames[i - 1] = argv[i];
         fprintf(stderr, "%s\n", argv[i]);
     }
-
-    pthread_t threads[numFiles];
-    int fd;
-
-    /*
-    for(int i = 0; i < numFiles; i++) {
-        fd = open(argv[i], O_RDONLY);
-        pthread_create(&threads[i], NULL, playFile, &fd);
-    }
-    pthread_exit(NULL);
-    */
 
     // Ncurses code
     initCurses();
@@ -130,6 +126,9 @@ int main(int argc, char *argv[]) {
 
     // Play back vars
     int tempo = 120;
+
+    // Audio file structs
+    audioFile *files = initFiles(numFiles, fileNames);
 
     // Print usage info left of the game grid
     mvprintw(2, WINDOW_WIDTH + 3, "Start/Stop sequence: Spacebar\n");

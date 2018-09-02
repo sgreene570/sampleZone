@@ -90,8 +90,6 @@ void playback(unsigned int rate, int channels, double seconds, int fd){
     for (loops = (seconds * 1000000) / tmp; loops > 0; loops--) {
 
         if ((pcm = read(fd, buff, buff_size)) == 0) {
-            printf("Early end of file.\n");
-            printf("%s%d\n", buff, buff_size);
             return;
         }
 
