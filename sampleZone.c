@@ -36,7 +36,7 @@ void *playFile(void *file) {
         printf("Error reading wav header\n");
         return NULL;
     }
-    double length = wavLength(header->subChunk2Size, header->byteRate); 
+    double length = wavLength(header->subChunk2Size, header->byteRate);
     // Debug wav header
     // printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
     playback(header->sampleRate + (((audioFile *) file)->pitchAdjust * 500), header->numChannels, length, fd);
@@ -70,7 +70,9 @@ audioFile *initFiles(int numFiles, char *fileNames[]) {
 }
 
 void playPattern(WINDOW *win, audioFile *files, int tempo) {
+    // Make wgetch a non-blocking call
     nodelay(win, TRUE);
+    // Play through grid
     for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
         for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET - 1; x++) {
             if (wgetch(win) == ' ') {
@@ -110,6 +112,9 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "%s\n", argv[i]);
     }
 
+    // Audio file structs
+    audioFile *files = initFiles(numFiles, fileNames);
+
     // Ncurses code
     initCurses();
     int x = OFFSET;
@@ -118,17 +123,16 @@ int main(int argc, char *argv[]) {
     refresh();
     WINDOW *win = create_newwin(WINDOW_HEIGHT, WINDOW_WIDTH, y, x);
     wrefresh(win);
+
     // Print file names and symbols
-    mvprintw(WINDOW_HEIGHT + 1, 0, "Loaded Samples:\n");
-    for(int i = 1; i <= numFiles; i++) {
-        mvprintw(WINDOW_HEIGHT + i  + 1, 0, "%d: %s", i - 1, argv[i]);
+    mvprintw(WINDOW_HEIGHT + 1, 1, "Loaded Samples:\n");
+    for(int i = 0; i < numFiles; i++) {
+        mvprintw(WINDOW_HEIGHT + i  + 2, 1, "%d: %s (Pitch Adjust: %d)",
+            i, fileNames[i], files[i].pitchAdjust);
     }
 
     // Play back vars
     int tempo = 120;
-
-    // Audio file structs
-    audioFile *files = initFiles(numFiles, fileNames);
 
     // Print usage info left of the game grid
     mvprintw(2, WINDOW_WIDTH + 3, "Start/Stop sequence: Spacebar\n");
