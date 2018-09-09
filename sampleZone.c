@@ -19,7 +19,7 @@
 #define SAMPLE_MARKERS "0123456789"
 
 typedef struct audioFile_t {
-    int fd;
+    char *fileName;
     int pitchAdjust;
 } audioFile;
 
@@ -28,7 +28,8 @@ double wavLength(u_int32_t wavSize, u_int32_t byteRate) {
 }
 
 void *playFile(void *file) {
-    int fd = ((audioFile *)file)->fd;
+    char *fileName = ((audioFile *)file)->fileName;
+    int fd = open(fileName, O_RDONLY);
     // Read wav file header (44 bytes long)
     wavHeader *header =  calloc(1, 44);
     int out = read(fd, header, 44);
@@ -41,6 +42,7 @@ void *playFile(void *file) {
     // printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
     playback(header->sampleRate + (((audioFile *) file)->pitchAdjust * 500), header->numChannels, length, fd);
     pthread_exit(NULL);
+    close(fd);
 }
 
 static WINDOW *create_newwin(int height, int width, int starty, int startx) {
@@ -62,7 +64,7 @@ bool checkSymbol(char input, char *symbols, int numSymbols) {
 audioFile *initFiles(int numFiles, char *fileNames[]) {
     audioFile *files = calloc(numFiles, sizeof(audioFile));
     for(int i = 0; i < numFiles; i++) {
-        files[i].fd = open(fileNames[i], O_RDONLY);
+        files[i].fileName = fileNames[i];
         files[i].pitchAdjust = 0;
     }
 
@@ -145,9 +147,15 @@ int main(int argc, char *argv[]) {
     while((ch = wgetch(win)) != 'q') {
         if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
             mvwaddch(win, y, x, ch);
+            if(x + 1 < OFFSET + WINDOW_WIDTH - 2) {
+                x++;
+            } else {
+                y++;
+                x = OFFSET;
+            }
         } else if (ch == ' ') {
-            playPattern(win, files, tempo);
             wmove(win, y, x);
+            playPattern(win, files, tempo);
         } else {
             // Vim arrow controls with grid boundaries in mind
             switch(ch) {
