@@ -108,6 +108,11 @@ void initCurses() {
 int main(int argc, char *argv[]) {
     int numFiles = argc - 1;
     char *fileNames[numFiles];
+
+    if (numFiles == 0) {
+        printf("No input files specified\n");
+        return 0;
+    }
     // Parse file name input
     for(int i = 1; i < argc; i++) {
         fileNames[i - 1] = argv[i];
@@ -140,6 +145,12 @@ int main(int argc, char *argv[]) {
     mvprintw(2, WINDOW_WIDTH + 3, "Start/Stop sequence: Spacebar\n");
     mvprintw(3, WINDOW_WIDTH + 3, "Inc/Dec tempo: +/-\n");
     mvprintw(4, WINDOW_WIDTH + 3, "Tempo: %d\n", tempo);
+    mvprintw(5, WINDOW_WIDTH + 3, "Adjust pitch: </>\n");
+    mvprintw(6, WINDOW_WIDTH + 3, "Select file: Up/Down arrow\b");
+
+    // Initial select file for tempo adjust
+    int selectedFileIndex = 0;
+    audioFile *selectedFile = &files[selectedFileIndex];
 
     refresh();
     wmove(win, y, x);
@@ -188,6 +199,32 @@ int main(int argc, char *argv[]) {
                     tempo--;
                     mvprintw(4, WINDOW_WIDTH + 10, "%d\n", tempo);
                     refresh();
+                    break;
+                case '<':
+                    selectedFile->pitchAdjust -= 1;
+                    mvprintw(WINDOW_HEIGHT + selectedFileIndex  + 2, 1, "%d: %s (Pitch Adjust: %d)",
+                    selectedFileIndex, fileNames[selectedFileIndex], selectedFile->pitchAdjust);
+                    refresh();
+                    break;
+                case '>':
+                    selectedFile->pitchAdjust += 1;
+                    mvprintw(WINDOW_HEIGHT + selectedFileIndex  + 2, 1, "%d: %s (Pitch Adjust: %d)",
+                    selectedFileIndex, fileNames[selectedFileIndex], selectedFile->pitchAdjust);
+                    refresh();
+                    break;
+                case (char)KEY_UP:
+                    // Up arrow handling
+                    if(selectedFileIndex != 0){
+                        selectedFileIndex--;
+                        selectedFile = &files[selectedFileIndex];
+                    }
+                    break;
+                case (char)KEY_DOWN:
+                    // Down arrow handling
+                    if(selectedFileIndex + 1 < numFiles){
+                        selectedFileIndex++;
+                        selectedFile = &files[selectedFileIndex];
+                    }
                     break;
                 }
             wmove(win, y, x);
