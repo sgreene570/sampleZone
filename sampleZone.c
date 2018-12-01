@@ -116,7 +116,6 @@ int main(int argc, char *argv[]) {
     // Parse file name input
     for(int i = 1; i < argc; i++) {
         fileNames[i - 1] = argv[i];
-        fprintf(stderr, "%s\n", argv[i]);
     }
 
     // Audio file structs
