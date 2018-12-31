@@ -67,7 +67,7 @@ void playback(unsigned int rate, int channels, double seconds, int fd){
     snd_pcm_hw_params_get_channels(params, &tmp);
     //printf("channels: %i ", tmp);
 
-    /*
+    /* Mono/stereo check
     if (tmp == 1)
         printf("(mono)\n");
     else if (tmp == 2)
