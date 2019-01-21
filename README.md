@@ -20,9 +20,25 @@ Fedora:
 
 `ncurses-devel`
 
+Ubuntu:
+
+`libasound2-dev`
+
+`ncurses*`
+
+`libncurses*`
+
+`clang` (Use clang for building on Ubuntu)
+
 # Building
 
+Debian and Fedora:
+
 Simply run `make`
+
+Ubuntu:
+
+`make CC=clang`
 
 # Usage
 
