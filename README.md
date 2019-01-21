@@ -10,6 +10,10 @@ Debian:
 
 `libasound2-dev`
 
+Fedora: 
+`libasound2-dev`
+`ncurses-devel`
+
 # Building
 
 Simply run `make`
