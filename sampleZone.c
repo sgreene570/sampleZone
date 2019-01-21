@@ -13,8 +13,8 @@
 #include <unistd.h>
 #include "playback.h"
 
-#define WINDOW_HEIGHT 20
-#define WINDOW_WIDTH 30
+#define WINDOW_HEIGHT 28
+#define WINDOW_WIDTH 42
 #define OFFSET 1
 #define SAMPLE_MARKERS "0123456789"
 
@@ -71,12 +71,25 @@ audioFile *initFiles(int numFiles, char *fileNames[]) {
     return files;
 }
 
+void printMeasureMarkers(int currMeasure) {
+    for(int i = 0; i < WINDOW_WIDTH - 1; i += 4) {
+        if(i == currMeasure * 4) {
+            attron(A_STANDOUT);
+        }
+        mvaddch(0, 2 * OFFSET + i, 'v');
+        attroff(A_STANDOUT);
+    }
+    refresh();
+}
+
 void playPattern(WINDOW *win, audioFile *files, int tempo) {
     // Make wgetch a non-blocking call
     nodelay(win, TRUE);
     // Play through grid
     for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
         for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET - 1; x++) {
+            printMeasureMarkers((x - OFFSET - 1) / 4);
+            wrefresh(win);
             if (wgetch(win) == ' ') {
                 return;
             }
@@ -138,9 +151,14 @@ int main(int argc, char *argv[]) {
     int x = OFFSET;
     int y = OFFSET;
     char ch;
+
+    // Print initial grid
     refresh();
     WINDOW *win = create_newwin(WINDOW_HEIGHT, WINDOW_WIDTH, y, x);
     wrefresh(win);
+
+    // Print measure markers
+    printMeasureMarkers(0);
 
     // Print sample info
     printSamples(files, fileNames, 0, numFiles);
