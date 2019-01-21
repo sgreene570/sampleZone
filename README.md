@@ -1,5 +1,7 @@
 # sampleZone
 
+[![Build Status](https://travis-ci.org/sgreene570/sampleZone.svg?branch=master)](https://travis-ci.org/sgreene570/sampleZone)
+
 Play samples from a sequencer like command line interface.
 
 Work in progress.
@@ -9,6 +11,7 @@ Work in progress.
 Debian:
 
 `libasound2-dev`
+
 `ncurses-dev`
 
 Fedora: 
