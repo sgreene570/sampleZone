@@ -1,0 +1,5 @@
+language: c
+before_install:
+    - sudo apt-get install libncurses5-dev libncursesw5-dev ncurses-dev libncurses* libasound2 libasound2-dev alsa alsa-tools clang
+script: make CC=clang
+

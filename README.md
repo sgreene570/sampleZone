@@ -9,9 +9,12 @@ Work in progress.
 Debian:
 
 `libasound2-dev`
+`ncurses-dev`
 
 Fedora: 
+
 `libasound2-dev`
+
 `ncurses-devel`
 
 # Building
