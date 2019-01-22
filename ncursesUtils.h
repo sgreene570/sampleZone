@@ -1,0 +1,17 @@
+#ifndef NCURSESUTILS_H
+#define NCURSES_UTILS_H
+
+// Ncurses init function
+void initCurses();
+
+// Creates ncurses window for main program grid
+// Returns window as an ncurses window pointer
+WINDOW *createWindow(int height, int width, int starty, int startx);
+
+// Prints measure markers at top of terminal
+void printMeasureMarkers(int currMeasure, int windowWidth);
+
+// Prints file information
+void printSamples(audioFile *files, char *fileNames[], int highlightIndex, int numFiles, int windowHeight);
+
+#endif
