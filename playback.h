@@ -25,4 +25,10 @@ typedef struct wavHeader_t {
     u_int32_t subChunk2Size;
 } wavHeader;
 
+// Audio file basic struct
+typedef struct audioFile_t {
+    char *fileName;
+    int pitchAdjust;
+} audioFile;
+
 #endif

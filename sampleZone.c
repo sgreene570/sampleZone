@@ -12,16 +12,12 @@
 #include <ncurses.h>
 #include <unistd.h>
 #include "playback.h"
+#include "ncursesUtils.h"
 
 #define WINDOW_HEIGHT 28
 #define WINDOW_WIDTH 42
 #define OFFSET 1
 #define SAMPLE_MARKERS "0123456789"
-
-typedef struct audioFile_t {
-    char *fileName;
-    int pitchAdjust;
-} audioFile;
 
 double wavLength(u_int32_t wavSize, u_int32_t byteRate) {
     return (double) wavSize / byteRate;
@@ -45,13 +41,6 @@ void *playFile(void *file) {
     close(fd);
 }
 
-static WINDOW *create_newwin(int height, int width, int starty, int startx) {
-    WINDOW *local_win = newwin(height, width, starty, startx);
-    box(local_win, 0, 0);
-    keypad(local_win, TRUE);
-    return (local_win);
-}
-
 bool checkSymbol(char input, char *symbols, int numSymbols) {
     for (int i = 0; i < numSymbols; i++) {
         if (symbols[i] == input) {
@@ -71,24 +60,13 @@ audioFile *initFiles(int numFiles, char *fileNames[]) {
     return files;
 }
 
-void printMeasureMarkers(int currMeasure) {
-    for(int i = 0; i < WINDOW_WIDTH - 1; i += 4) {
-        if(i == currMeasure * 4) {
-            attron(A_STANDOUT);
-        }
-        mvaddch(0, 2 * OFFSET + i, 'v');
-        attroff(A_STANDOUT);
-    }
-    refresh();
-}
-
 void playPattern(WINDOW *win, audioFile *files, int tempo) {
     // Make wgetch a non-blocking call
     nodelay(win, TRUE);
     // Play through grid
     for (int y = OFFSET; y < WINDOW_HEIGHT + OFFSET; y++) {
         for (int x = OFFSET; x < WINDOW_WIDTH + OFFSET - 1; x++) {
-            printMeasureMarkers((x - OFFSET - 1) / 4);
+            printMeasureMarkers((x - OFFSET - 1) / 4, WINDOW_WIDTH);
             wrefresh(win);
             if (wgetch(win) == ' ') {
                 return;
@@ -108,26 +86,6 @@ void playPattern(WINDOW *win, audioFile *files, int tempo) {
 
     }
     pthread_exit(NULL);
-}
-
-void printSamples(audioFile *files, char *fileNames[], int highlightIndex, int numFiles) {
-    mvprintw(WINDOW_HEIGHT + 1, 1, "Loaded samples:\n");
-    for(int i = 0; i < numFiles; i++) {
-        if (i == highlightIndex) {
-            attron(A_STANDOUT);
-        }
-        mvprintw(WINDOW_HEIGHT + i  + 2, 1, "%d: %s (Pitch Adjust: %d)",
-            i, fileNames[i], files[i].pitchAdjust);
-        attroff(A_STANDOUT);
-    }
-}
-
-// Ncurses startup calls
-void initCurses() {
-    initscr();
-    cbreak();
-    keypad(stdscr, TRUE);
-    noecho();
 }
 
 int main(int argc, char *argv[]) {
@@ -154,14 +112,14 @@ int main(int argc, char *argv[]) {
 
     // Print initial grid
     refresh();
-    WINDOW *win = create_newwin(WINDOW_HEIGHT, WINDOW_WIDTH, y, x);
+    WINDOW *win = createWindow(WINDOW_HEIGHT, WINDOW_WIDTH, y, x);
     wrefresh(win);
 
     // Print measure markers
-    printMeasureMarkers(0);
+    printMeasureMarkers(0, WINDOW_WIDTH);
 
     // Print sample info
-    printSamples(files, fileNames, 0, numFiles);
+    printSamples(files, fileNames, 0, numFiles, WINDOW_HEIGHT);
 
     // Play back vars
     int tempo = 120;
@@ -227,12 +185,12 @@ int main(int argc, char *argv[]) {
                     break;
                 case '<':
                     selectedFile->pitchAdjust -= 1;
-                    printSamples(files, fileNames, selectedFileIndex, numFiles);
+                    printSamples(files, fileNames, selectedFileIndex, numFiles, WINDOW_HEIGHT);
                     refresh();
                     break;
                 case '>':
                     selectedFile->pitchAdjust += 1;
-                    printSamples(files, fileNames, selectedFileIndex, numFiles);
+                    printSamples(files, fileNames, selectedFileIndex, numFiles, WINDOW_HEIGHT);
                     refresh();
                     break;
                 case (char)KEY_UP:
@@ -240,7 +198,7 @@ int main(int argc, char *argv[]) {
                     if(selectedFileIndex != 0){
                         selectedFileIndex--;
                         selectedFile = &files[selectedFileIndex];
-                        printSamples(files, fileNames, selectedFileIndex, numFiles);
+                        printSamples(files, fileNames, selectedFileIndex, numFiles, WINDOW_HEIGHT);
                         refresh();
                     }
                     break;
@@ -249,7 +207,7 @@ int main(int argc, char *argv[]) {
                     if(selectedFileIndex + 1 < numFiles){
                         selectedFileIndex++;
                         selectedFile = &files[selectedFileIndex];
-                        printSamples(files, fileNames, selectedFileIndex, numFiles);
+                        printSamples(files, fileNames, selectedFileIndex, numFiles, WINDOW_HEIGHT);
                         refresh();
                     }
                     break;
