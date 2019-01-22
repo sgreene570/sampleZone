@@ -1,5 +1,5 @@
 #ifndef NCURSESUTILS_H
-#define NCURSES_UTILS_H
+#define NCURSESUTILS_H
 
 // Ncurses init function
 void initCurses();
