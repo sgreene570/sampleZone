@@ -4,7 +4,7 @@
 
 Play samples from a sequencer like command line interface.
 
-Work in progress.
+Work in progress! Accepting pull requests.
 
 # System requirements:
 
@@ -28,7 +28,7 @@ Ubuntu:
 
 `libncurses*`
 
-`clang` (Use clang for building on Ubuntu)
+`clang` (Mignt need to use clang for building on Ubuntu due to GCC versioning)
 
 # Building
 
@@ -42,4 +42,6 @@ Ubuntu:
 
 # Usage
 
-`./sampleZone <file1.wav> <file2.wav> ...`
+`./sampleZone [-w] [-h] <file1.wav> <file2.wav> ...`
+
+Where `w` and `h` are optional width/height grid parameters.
