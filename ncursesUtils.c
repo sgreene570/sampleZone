@@ -46,3 +46,17 @@ void printSamples(audioFile *files, char *fileNames[], int highlightIndex, int n
         attroff(A_STANDOUT);
     }
 }
+
+//You're probably going to need an index
+void sampleError(char* fileName, int highlightIndex, int windowHeight) {
+    mvprintw(windowHeight + 2, 45, "                         ");
+    attron(A_STANDOUT);
+    char* errorMsg = "--ERROR LOADING FILE--";
+    mvprintw(windowHeight + 1, 45, errorMsg);
+    attron(A_STANDOUT);
+    mvprintw(windowHeight + 2, 45, fileName);
+//    for(int i = 0; i < sizeof(fileName); i++) {
+//        mvprintw(windowHeight + 2 + i, 45, fileName[i]);
+//	}
+    attroff(A_STANDOUT);
+}
