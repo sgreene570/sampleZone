@@ -32,13 +32,9 @@ Ubuntu:
 
 # Building
 
-Debian and Fedora:
+Debian, Ubuntu and Fedora:
 
 Simply run `make`
-
-Ubuntu:
-
-`make CC=clang`
 
 # Usage
 
