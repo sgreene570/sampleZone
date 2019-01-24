@@ -17,7 +17,7 @@
 
 #define DEFAULT_WINDOW_HEIGHT 28
 #define DEFAULT_WINDOW_WIDTH 42
-#define OFFSET 1
+#define WINDOW_OFFSET 1
 #define SAMPLE_MARKERS "0123456789"
 
 static int height = DEFAULT_WINDOW_HEIGHT;
@@ -60,7 +60,6 @@ audioFile *initFiles(int numFiles, char *fileNames[]) {
         files[i].fileName = fileNames[i];
         files[i].pitchAdjust = 0;
     }
-
     return files;
 }
 
@@ -68,9 +67,9 @@ void playPattern(WINDOW *win, audioFile *files, int tempo) {
     // Make wgetch a non-blocking call
     nodelay(win, TRUE);
     // Play through grid
-    for (int y = OFFSET; y < height + OFFSET; y++) {
-        for (int x = OFFSET; x < width + OFFSET - 1; x++) {
-            printMeasureMarkers((x - OFFSET - 1) / 4, width);
+    for (int y = WINDOW_OFFSET; y < height + WINDOW_OFFSET; y++) {
+        for (int x = WINDOW_OFFSET; x < width + WINDOW_OFFSET - 1; x++) {
+            printMeasureMarkers((x - WINDOW_OFFSET - 1) / 4, width);
             wrefresh(win);
             if (wgetch(win) == ' ') {
                 return;
@@ -93,8 +92,8 @@ void playPattern(WINDOW *win, audioFile *files, int tempo) {
 }
 
 static void printUsage() {
-    printf("Usage: sampleZone [-w] [-h] audioFile...\n");
-    exit(1);
+    printf("Usage: sampleZone [-w] [-h] <file1.wav> <file2.wav> ...\n");
+    exit(EXIT_FAILURE);
 }
 
 int main(int argc, char *argv[]) {
@@ -142,8 +141,8 @@ int main(int argc, char *argv[]) {
 
     // Ncurses code
     initCurses();
-    int x = OFFSET;
-    int y = OFFSET;
+    int x = WINDOW_OFFSET;
+    int y = WINDOW_OFFSET;
     char ch;
 
     // Print initial grid
@@ -177,11 +176,11 @@ int main(int argc, char *argv[]) {
     while((ch = wgetch(win)) != 'q') {
         if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
             mvwaddch(win, y, x, ch);
-            if(x + 1 < OFFSET + width - 2) {
+            if(x + 1 < WINDOW_OFFSET + width - 2) {
                 x++;
             } else {
                 y++;
-                x = OFFSET;
+                x = WINDOW_OFFSET;
             }
         } else if (ch == ' ') {
             wmove(win, y, x);
@@ -190,22 +189,22 @@ int main(int argc, char *argv[]) {
             // Vim arrow controls with grid boundaries in mind
             switch(ch) {
                 case 'h':
-                    if(x - 1 > OFFSET - 1) {
+                    if(x - 1 > WINDOW_OFFSET - 1) {
                         x--;
                     }
                     break;
                 case 'l':
-                    if(x + 1 < OFFSET + width - 2) {
+                    if(x + 1 < WINDOW_OFFSET + width - 2) {
                         x++;
                     }
                     break;
                 case 'j':
-                    if(y + 1 < OFFSET + width - 2) {
+                    if(y + 1 < WINDOW_OFFSET + width - 2) {
                         y++;
                     }
                     break;
                 case 'k':
-                    if(y - 1 > OFFSET - 1) {
+                    if(y - 1 > WINDOW_OFFSET - 1) {
                         y--;
                     }
                     break;
@@ -253,7 +252,7 @@ int main(int argc, char *argv[]) {
         // Refresh grid after each cursor move or screen print (important)
         wrefresh(win);
     }
-
+    delwin(win);
     endwin();
-    return 0;
+    return EXIT_SUCCESS;
 }
