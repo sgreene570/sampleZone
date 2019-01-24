@@ -24,15 +24,9 @@ Ubuntu:
 
 `libasound2-dev`
 
-`ncurses*`
-
-`libncurses*`
-
-`clang` (Mignt need to use clang for building on Ubuntu due to GCC versioning)
+Additional ncurses packages may or may not be needed for Ubuntu.
 
 # Building
-
-Debian, Ubuntu and Fedora:
 
 Simply run `make`
 
