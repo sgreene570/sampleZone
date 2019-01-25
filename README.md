@@ -4,7 +4,7 @@
 
 Play samples from a sequencer like command line interface.
 
-Work in progress.
+Work in progress! Accepting pull requests.
 
 # System requirements:
 
@@ -24,22 +24,14 @@ Ubuntu:
 
 `libasound2-dev`
 
-`ncurses*`
-
-`libncurses*`
-
-`clang` (Use clang for building on Ubuntu)
+Additional ncurses packages may or may not be needed for Ubuntu.
 
 # Building
 
-Debian and Fedora:
-
 Simply run `make`
-
-Ubuntu:
-
-`make CC=clang`
 
 # Usage
 
-`./sampleZone <file1.wav> <file2.wav> ...`
+`./sampleZone [-w] [-h] <file1.wav> <file2.wav> ...`
+
+Where `w` and `h` are optional width/height grid parameters.
