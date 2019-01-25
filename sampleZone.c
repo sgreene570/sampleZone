@@ -31,10 +31,12 @@ void *playFile(void *file) {
     char *fileName = ((audioFile *)file)->fileName;
     int fd = open(fileName, O_RDONLY);
     // Read wav file header (44 bytes long)
-    wavHeader *header =  calloc(1, 44);
+    wavHeader *header = calloc(1, 44);
     int out = read(fd, header, 44);
     if (out != 44) {
-        printf("Error reading wav header\n");
+        //Put sampleError here
+        sampleError(fileName, 0, DEFAULT_WINDOW_HEIGHT);
+        //printf("Error reading wav header\n");
         return NULL;
     }
     double length = wavLength(header->subChunk2Size, header->byteRate);
@@ -136,6 +138,8 @@ int main(int argc, char *argv[]) {
         fileNames[i - firstArgument] = argv[i];
     }
 
+    //TODO: add inout for WINDOW_SIZE and stuff  
+
     // Audio file structs
     audioFile *files = initFiles(numFiles, fileNames);
 
@@ -169,6 +173,22 @@ int main(int argc, char *argv[]) {
     // Initial select file for tempo adjust
     int selectedFileIndex = 0;
     audioFile *selectedFile = &files[selectedFileIndex];
+
+    //Check files for errors (TODO: More robust error checking code. Make this not broken)
+//    char badFiles[numFiles];
+//    for (int i = 1; i <= numFiles; i++) {
+//        int fd = open(fileNames[i], O_RDONLY);
+//        // Read wav file header (44 bytes long)
+//        wavHeader *header = calloc(1, 44);
+//        int out = read(fd, header, 44);
+//        if (out != 44) {
+//            badFiles[i-1] = fileNames[i];
+//            //Put sampleError here: sampleError(fileName, 0, WINDOW_HEIGHT);
+//            //printf("Error reading wav header\n");
+//            return NULL;
+//        }
+//        //sampleError(badFiles, 0, WINDOW_HEIGHT);
+//    }
 
     refresh();
     wmove(win, y, x);

@@ -14,4 +14,7 @@ void printMeasureMarkers(int currMeasure, int windowWidth);
 // Prints file information
 void printSamples(audioFile *files, char *fileNames[], int highlightIndex, int numFiles, int windowHeight);
 
+// Prints an error on a file when stuff goes whack
+sampleError(char* fileName, int highlightIndex, int windowHeight);
+
 #endif
