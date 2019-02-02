@@ -18,7 +18,9 @@
 #define DEFAULT_WINDOW_HEIGHT 28
 #define DEFAULT_WINDOW_WIDTH 42
 #define WINDOW_OFFSET 1
-#define SAMPLE_MARKERS "0123456789"
+#define SAMPLE_MARKERS "0123456789abcdef"
+#define MAX_FILES 16
+#define FILE_NOT_FOUND "File Not Found!"
 
 static int height = DEFAULT_WINDOW_HEIGHT;
 static int width = DEFAULT_WINDOW_WIDTH;
@@ -35,7 +37,7 @@ void *playFile(void *file) {
     int out = read(fd, header, 44);
     if (out != 44) {
         //Put sampleError here
-        sampleError(fileName, 0, DEFAULT_WINDOW_HEIGHT);
+        sampleError(fileName, DEFAULT_WINDOW_HEIGHT);
         //printf("Error reading wav header\n");
         return NULL;
     }
@@ -65,7 +67,7 @@ audioFile *initFiles(int numFiles, char *fileNames[]) {
     return files;
 }
 
-void playPattern(WINDOW *win, audioFile *files, int tempo) {
+void playPattern(WINDOW *win, audioFile *files, int tempo, int numFiles) {
     // Make wgetch a non-blocking call
     nodelay(win, TRUE);
     // Play through grid
@@ -85,7 +87,22 @@ void playPattern(WINDOW *win, audioFile *files, int tempo) {
             pthread_t thread;
             if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
                 wrefresh(win);
-                pthread_create(&thread, NULL, playFile, &files[(int) ch - '0']);
+
+                int fileToPlay = 0;
+                if (ch >= 'a' && ch <= 'f') {
+                    fileToPlay = 10 + (int) ch - 'a';
+                } else if (ch >= '0' && ch <= '9'){
+                    fileToPlay = (int) ch - '0';
+                } else {
+                    return;
+                }
+
+                if (fileToPlay > numFiles) {
+                    sampleError(FILE_NOT_FOUND, DEFAULT_WINDOW_HEIGHT);
+                    continue;
+                }
+
+                pthread_create(&thread, NULL, playFile, &files[fileToPlay]);
             }
         }
 
@@ -94,7 +111,7 @@ void playPattern(WINDOW *win, audioFile *files, int tempo) {
 }
 
 static void printUsage() {
-    printf("Usage: sampleZone [-w] [-h] <file1.wav> <file2.wav> ...\n");
+    printf("Usage: sampleZone [-w] [-h] <file1.wav> <file2.wav> ... <file16.wav>\n");
     exit(EXIT_FAILURE);
 }
 
@@ -127,6 +144,10 @@ int main(int argc, char *argv[]) {
         }
     }
     int numFiles = argc - firstArgument;
+
+    if (numFiles > MAX_FILES) { 
+        printUsage();
+    }
     char *fileNames[numFiles];
 
     if (numFiles == 0) {
@@ -204,7 +225,7 @@ int main(int argc, char *argv[]) {
             }
         } else if (ch == ' ') {
             wmove(win, y, x);
-            playPattern(win, files, tempo);
+            playPattern(win, files, tempo, numFiles);
         } else {
             // Vim arrow controls with grid boundaries in mind
             switch(ch) {
