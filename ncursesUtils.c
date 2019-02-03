@@ -57,11 +57,13 @@ void printSamples(audioFile *files, char *fileNames[], int highlightIndex, int n
 
 //You're probably going to need an index
 void sampleError(char* fileName, int windowHeight) {
-    mvprintw(windowHeight + 2, 45, "                         ");
+    //Clears the area of the screen that indicates which file is bad.
+    move(windowHeight - 1, 45);
+    clrtoeol();
     attron(A_STANDOUT);
     char* errorMsg = "--ERROR LOADING FILE--";
-    mvprintw(windowHeight + 1, 45, errorMsg);
+    mvprintw(windowHeight - 2, 45, errorMsg);
     attron(A_STANDOUT);
-    mvprintw(windowHeight + 2, 45, fileName);
+    mvprintw(windowHeight - 1, 45, fileName);
     attroff(A_STANDOUT);
 }
