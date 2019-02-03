@@ -195,22 +195,6 @@ int main(int argc, char *argv[]) {
     int selectedFileIndex = 0;
     audioFile *selectedFile = &files[selectedFileIndex];
 
-    //Check files for errors (TODO: More robust error checking code. Make this not broken)
-//    char badFiles[numFiles];
-//    for (int i = 1; i <= numFiles; i++) {
-//        int fd = open(fileNames[i], O_RDONLY);
-//        // Read wav file header (44 bytes long)
-//        wavHeader *header = calloc(1, 44);
-//        int out = read(fd, header, 44);
-//        if (out != 44) {
-//            badFiles[i-1] = fileNames[i];
-//            //Put sampleError here: sampleError(fileName, 0, WINDOW_HEIGHT);
-//            //printf("Error reading wav header\n");
-//            return NULL;
-//        }
-//        //sampleError(badFiles, 0, WINDOW_HEIGHT);
-//    }
-
     refresh();
     wmove(win, y, x);
     wrefresh(win);
