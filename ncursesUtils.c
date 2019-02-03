@@ -41,6 +41,9 @@ void printSamples(audioFile *files, char *fileNames[], int highlightIndex, int n
         if (i == highlightIndex) {
             attron(A_STANDOUT);
         }
+        move(windowHeight + i + 2, 0);
+        clrtoeol();
+
         if (i > 9) {
             mvprintw(windowHeight + i + 2, 1, "%0x: %s (Pitch Adjust: %d)", 
                 i, fileNames[i], files[i].pitchAdjust);
