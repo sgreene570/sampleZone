@@ -6,6 +6,8 @@ Play samples from a sequencer like command line interface.
 
 Work in progress! Accepting pull requests.
 
+Uses vim controls (h,j,k,l) for cursor movement.
+
 # System requirements:
 
 Debian:
@@ -35,3 +37,7 @@ Simply run `make`
 `./sampleZone [-w] [-h] <file1.wav> <file2.wav> ...`
 
 Where `w` and `h` are optional width/height grid parameters.
+
+# Screenshots
+
+![samplezone screenshot](https://i.imgur.com/8GwcYri.png)
