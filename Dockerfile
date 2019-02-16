@@ -5,5 +5,5 @@ RUN git clone https://github.com/sgreene570/sampleZone
 RUN wget https://csh.rit.edu/~purple/test.wav
 WORKDIR "/sampleZone"
 RUN make
-COPY sampleZone /bin/
+RUN cp sampleZone /bin
 ENTRYPOINT ["sampleZone", "/test.wav"]
