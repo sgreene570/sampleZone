@@ -18,7 +18,7 @@ Debian:
 
 Fedora: 
 
-`libasound2-dev`
+`alsa-lib-devel`
 
 `ncurses-devel`
 
