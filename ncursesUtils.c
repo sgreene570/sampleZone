@@ -25,7 +25,7 @@ WINDOW *createWindow(int height, int width, int starty, int startx) {
 
 // Prints measure markers in terminal ignoring windows
 void printMeasureMarkers(int currMeasure, int windowWidth) {
-    for(int i = 0; i < windowWidth - 1; i += 4) {
+    for(int i = 0; i < windowWidth - 2; i += 4) {
         if(i == currMeasure * 4) {
             attron(A_STANDOUT);
         }

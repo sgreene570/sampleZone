@@ -71,7 +71,7 @@ void playPattern(WINDOW *win, audioFile *files, int tempo, int numFiles) {
     // Make wgetch a non-blocking call
     nodelay(win, TRUE);
     // Play through grid
-    for (int y = WINDOW_OFFSET; y < height + WINDOW_OFFSET; y++) {
+    for (int y = WINDOW_OFFSET; y < height + WINDOW_OFFSET - 1; y++) {
         for (int x = WINDOW_OFFSET; x < width + WINDOW_OFFSET - 1; x++) {
             printMeasureMarkers((x - WINDOW_OFFSET - 1) / 4, width);
             wrefresh(win);
@@ -105,7 +105,6 @@ void playPattern(WINDOW *win, audioFile *files, int tempo, int numFiles) {
                 pthread_create(&thread, NULL, playFile, &files[fileToPlay]);
             }
         }
-
     }
     pthread_exit(NULL);
 }
@@ -159,12 +158,10 @@ int main(int argc, char *argv[]) {
         fileNames[i - firstArgument] = argv[i];
     }
 
-    //TODO: add inout for WINDOW_SIZE and stuff  
-
     // Audio file structs
     audioFile *files = initFiles(numFiles, fileNames);
 
-    // Ncurses code
+    // Ncurses calls
     initCurses();
     int x = WINDOW_OFFSET;
     int y = WINDOW_OFFSET;
