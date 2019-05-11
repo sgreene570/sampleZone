@@ -19,6 +19,9 @@
 #include <alloca.h>
 #include "playback.h"
 
+#include <ncurses.h>
+#include "ncursesUtils.h"
+
 #define PCM_DEVICE "default"
 
 void playback(unsigned int rate, int channels, double seconds, int fd){
@@ -43,21 +46,26 @@ void playback(unsigned int rate, int channels, double seconds, int fd){
     /* Set parameters */
     if ((pcm = snd_pcm_hw_params_set_access(pcm_handle, params,
                     SND_PCM_ACCESS_RW_INTERLEAVED)) < 0)
-        printf("ERROR: Can't set interleaved mode. %s\n", snd_strerror(pcm));
+        //printf("ERROR: Can't set interleaved mode. %s\n", snd_strerror(pcm));
+        sampleError("Can't set interleaved mode.", DEFAULT_WINDOW_HEIGHT);
 
     if ((pcm = snd_pcm_hw_params_set_format(pcm_handle, params,
                         SND_PCM_FORMAT_S16_LE)) < 0)
-        printf("ERROR: Can't set format. %s\n", snd_strerror(pcm));
+        //printf("ERROR: Can't set format. %s\n", snd_strerror(pcm));
+        sampleError("Can't set format.", DEFAULT_WINDOW_HEIGHT);
 
     if ((pcm = snd_pcm_hw_params_set_channels(pcm_handle, params, channels)) < 0)
-        printf("ERROR: Can't set channels number. %s\n", snd_strerror(pcm));
+        //printf("ERROR: Can't set channels number. %s\n", snd_strerror(pcm));
+        sampleError("Can't set channels number.", DEFAULT_WINDOW_HEIGHT);
 
     if ((pcm = snd_pcm_hw_params_set_rate_near(pcm_handle, params, &rate, 0)) < 0)
-        printf("ERROR: Can't set rate. %s\n", snd_strerror(pcm));
+        //printf("ERROR: Can't set rate. %s\n", snd_strerror(pcm));
+        sampleError("Can't set rate. ", DEFAULT_WINDOW_HEIGHT);
 
     /* Write parameters */
     if ((pcm = snd_pcm_hw_params(pcm_handle, params)) < 0)
-        printf("ERROR: Can't set harware parameters. %s\n", snd_strerror(pcm));
+        //printf("ERROR: Can't set harware parameters. %s\n", snd_strerror(pcm));
+        sampleError("Can't set hardware parameters. ", DEFAULT_WINDOW_HEIGHT);
 
     /* Resume information */
     //printf("PCM name: '%s'\n", snd_pcm_name(pcm_handle));
