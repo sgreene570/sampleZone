@@ -1,6 +1,10 @@
 #ifndef NCURSESUTILS_H
 #define NCURSESUTILS_H
 
+//Window size
+#define DEFAULT_WINDOW_HEIGHT 28
+#define DEFAULT_WINDOW_WIDTH 42
+
 // Ncurses init function
 void initCurses();
 
@@ -16,5 +20,8 @@ void printSamples(audioFile *files, char *fileNames[], int highlightIndex, int n
 
 // Prints an error on a file when stuff goes whack
 void sampleError(char* fileName, int windowHeight);
+
+// Clears sample errors off the screen (used when playing the file again)
+void clearErrors(int windowHeight);
 
 #endif

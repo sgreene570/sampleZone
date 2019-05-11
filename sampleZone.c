@@ -15,12 +15,9 @@
 #include "playback.h"
 #include "ncursesUtils.h"
 
-#define DEFAULT_WINDOW_HEIGHT 28
-#define DEFAULT_WINDOW_WIDTH 42
 #define WINDOW_OFFSET 1
 #define SAMPLE_MARKERS "0123456789abcdef"
 #define MAX_FILES 16
-#define FILE_NOT_FOUND "File Not Found!"
 
 static int height = DEFAULT_WINDOW_HEIGHT;
 static int width = DEFAULT_WINDOW_WIDTH;
@@ -36,8 +33,7 @@ void *playFile(void *file) {
     wavHeader *header = calloc(1, 44);
     int out = read(fd, header, 44);
     if (out != 44) {
-        //Put sampleError here
-        sampleError(fileName, DEFAULT_WINDOW_HEIGHT);
+        sampleError("Error reading wav header.", DEFAULT_WINDOW_HEIGHT);
         //printf("Error reading wav header\n");
         return NULL;
     }
@@ -68,6 +64,8 @@ audioFile *initFiles(int numFiles, char *fileNames[]) {
 }
 
 void playPattern(WINDOW *win, audioFile *files, int tempo, int numFiles) {
+    // Clear sampleErrors
+    clearErrors(DEFAULT_WINDOW_HEIGHT);
     // Make wgetch a non-blocking call
     nodelay(win, TRUE);
     // Play through grid
@@ -98,7 +96,7 @@ void playPattern(WINDOW *win, audioFile *files, int tempo, int numFiles) {
                 }
 
                 if (fileToPlay > numFiles) {
-                    sampleError(FILE_NOT_FOUND, DEFAULT_WINDOW_HEIGHT);
+                    sampleError("File not found.", DEFAULT_WINDOW_HEIGHT);
                     continue;
                 }
 
