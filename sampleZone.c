@@ -54,6 +54,20 @@ bool checkSymbol(char input, char *symbols, int numSymbols) {
     return false;
 }
 
+// Converts symbol a user types into a number that
+// should align with an audio file
+int convertSymbol(char input){
+    int convertedSymbol = 0;
+    if (input >= 'a' && input <= 'f') {
+        convertedSymbol = 10 + (int) input - 'a';
+    } else if (input >= '0' && input <= '9'){
+        convertedSymbol = (int) input - '0';
+    } else {
+        return -1;
+    }
+    return convertedSymbol;
+}
+
 audioFile *initFiles(int numFiles, char *fileNames[]) {
     audioFile *files = calloc(numFiles, sizeof(audioFile));
     for(int i = 0; i < numFiles; i++) {
@@ -86,14 +100,7 @@ void playPattern(WINDOW *win, audioFile *files, int tempo, int numFiles) {
             if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
                 wrefresh(win);
 
-                int fileToPlay = 0;
-                if (ch >= 'a' && ch <= 'f') {
-                    fileToPlay = 10 + (int) ch - 'a';
-                } else if (ch >= '0' && ch <= '9'){
-                    fileToPlay = (int) ch - '0';
-                } else {
-                    return;
-                }
+                int fileToPlay = convertSymbol(ch);
 
                 if (fileToPlay > numFiles) {
                     sampleError("File not found.", DEFAULT_WINDOW_HEIGHT);
@@ -195,12 +202,16 @@ int main(int argc, char *argv[]) {
     wrefresh(win);
     while((ch = wgetch(win)) != 'q') {
         if (checkSymbol(ch, SAMPLE_MARKERS, sizeof(SAMPLE_MARKERS))) {
-            mvwaddch(win, y, x, ch);
-            if(x + 1 < WINDOW_OFFSET + width - 2) {
-                x++;
-            } else {
-                y++;
-                x = WINDOW_OFFSET;
+            // This is where samples actually get added to the track.
+            // Check if the symbol exists.
+            if (convertSymbol(ch) < numFiles){
+                mvwaddch(win, y, x, ch);
+                if(x + 1 < WINDOW_OFFSET + width - 2) {
+                    x++;
+                } else {
+                    y++;
+                    x = WINDOW_OFFSET;
+                }
             }
         } else if (ch == ' ') {
             wmove(win, y, x);
