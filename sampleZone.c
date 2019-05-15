@@ -43,6 +43,7 @@ void *playFile(void *file) {
     playback(header->sampleRate + (((audioFile *) file)->pitchAdjust * 500), header->numChannels, length, fd);
     pthread_exit(NULL);
     close(fd);
+    free(header);
 }
 
 bool checkSymbol(char input, char *symbols, int numSymbols) {
@@ -285,5 +286,6 @@ int main(int argc, char *argv[]) {
     }
     delwin(win);
     endwin();
+    free(files);
     return EXIT_SUCCESS;
 }
