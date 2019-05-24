@@ -41,9 +41,9 @@ void *playFile(void *file) {
     // Debug wav header
     // printf("%u %u %f\n", header->subChunk2Size, header->byteRate, length);
     playback(header->sampleRate + (((audioFile *) file)->pitchAdjust * 500), header->numChannels, length, fd);
-    pthread_exit(NULL);
-    close(fd);
     free(header);
+    close(fd);
+    pthread_exit(NULL);
 }
 
 bool checkSymbol(char input, char *symbols, int numSymbols) {
