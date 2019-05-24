@@ -30,13 +30,17 @@ Additional ncurses packages may or may not be needed for Ubuntu.
 
 # Building
 
-Simply run `make`
+Simply run `make`.
 
 # Usage
 
 `./sampleZone [-w] [-h] <file1.wav> <file2.wav> ...`
 
 Where `w` and `h` are optional width/height grid parameters.
+
+# Example wav File
+
+See the (attempted) `Dockerfile` for a link to an example wav file.
 
 # Screenshots
 
