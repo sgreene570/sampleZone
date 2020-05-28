@@ -80,7 +80,7 @@ audioFile *initFiles(int numFiles, char *fileNames[]) {
 
 void playPattern(WINDOW *win, audioFile *files, int tempo, int numFiles) {
     // Clear sampleErrors
-    clearErrors(DEFAULT_WINDOW_HEIGHT);
+    clearErrors(height);
     // Make wgetch a non-blocking call
     nodelay(win, TRUE);
     // Play through grid
@@ -215,8 +215,9 @@ int main(int argc, char *argv[]) {
                 }
             }
         } else if (ch == ' ') {
-            wmove(win, y, x);
             playPattern(win, files, tempo, numFiles);
+            x = WINDOW_OFFSET;
+            y = WINDOW_OFFSET;
         } else {
             // Vim arrow controls with grid boundaries in mind
             switch(ch) {
